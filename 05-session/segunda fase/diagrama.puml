@@ -1,0 +1,65 @@
+@startuml
+title Diagrama de Paquetes - Airport Management System
+
+' === Paquete Seguridad ===
+package "module_security" {
+  class user
+  class role
+  class permission
+  class person
+}
+
+' === Paquete Geolocalización ===
+package "geolocation" {
+  class continent
+  class country
+  class department
+  class city
+}
+
+' === Paquete Infraestructura ===
+package "module_infrastructure" {
+  class airport
+  class terminal
+  class boarding_gate
+  class runway
+  class maintenance_facility
+}
+
+' === Paquete Gestión de Vuelos ===
+package "module_managementFlight" {
+  class airline
+  class aircraft
+  class route
+  class flight
+  class flight_schedule
+  class flight_status
+  class crew_role
+  class crew_member
+  class crew_assignment
+}
+
+' === Paquete Pasajeros y Servicios ===
+package "passengers_and_services" {
+  class passenger
+  class reservation
+  class ticket
+  class baggage
+  class checkin
+}
+
+' === Paquete Parametrización ===
+package "parameterization" {
+  class aircraft_type
+  class flight_type
+  class ticket_class
+}
+
+' ==== Relaciones principales entre paquetes ====
+module_security ..> passengers_and_services : authenticates
+geolocation ..> module_infrastructure : located_in
+module_infrastructure ..> module_managementFlight : manages
+module_managementFlight ..> passengers_and_services : booked_by
+parameterization ..> module_managementFlight : defines
+
+@enduml

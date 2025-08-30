@@ -1,0 +1,35 @@
+Packages - Airport Management System
+
+1 Module: Geography
+- Continent
+- Country
+- Department
+- City
+- Airport
+- Terminal
+- BoardingGate
+
+2 Module: Aircraft & Flights
+- AircraftType
+- Aircraft
+- AircraftMaintenance
+- Flight
+- FlightStatus
+- AircraftLocation
+- AircraftAvailability
+
+3 Module: People & Roles
+- Person
+- Employee
+- Role
+- Permission
+- RolePermission
+- CrewAssignment
+
+4 Module: Passengers & Transactions
+- Passenger
+- PassengerPreference
+- Ticket
+- TicketPayment
+- Baggage
+- CheckIn

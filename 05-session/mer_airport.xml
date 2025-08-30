@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MER name="InternationalAirportMER">
+  <Entities>
+    <Entity name="Continent">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+      <Attribute name="Description" type="string"/>
+    </Entity>
+    <Entity name="Country">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+      <Attribute name="Description" type="string"/>
+      <Attribute name="ContinentId" type="int" fk="Continent.Id" required="true"/>
+    </Entity>
+    <Entity name="Department">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+      <Attribute name="Description" type="string"/>
+      <Attribute name="CountryId" type="int" fk="Country.Id" required="true"/>
+    </Entity>
+    <Entity name="City">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+      <Attribute name="Description" type="string"/>
+      <Attribute name="DepartmentId" type="int" fk="Department.Id" required="true"/>
+    </Entity>
+    <Entity name="Airport">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+      <Attribute name="Address" type="string"/>
+      <Attribute name="CityId" type="int" fk="City.Id" required="true"/>
+    </Entity>
+    <Entity name="Terminal">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Code" type="string" required="true"/>
+      <Attribute name="Name" type="string"/>
+      <Attribute name="AirportId" type="int" fk="Airport.Id" required="true"/>
+    </Entity>
+    <Entity name="BoardingGate">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Code" type="string" required="true"/>
+      <Attribute name="Name" type="string"/>
+      <Attribute name="TerminalId" type="int" fk="Terminal.Id" required="true"/>
+    </Entity>
+    <Entity name="AircraftType">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Code" type="string" required="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+    </Entity>
+    <Entity name="Aircraft">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="RegistrationNumber" type="string" unique="true" required="true"/>
+      <Attribute name="SerialNumber" type="string" unique="true"/>
+      <Attribute name="Model" type="string"/>
+      <Attribute name="Manufacturer" type="string"/>
+      <Attribute name="Capacity" type="int"/>
+      <Attribute name="MaxTakeoffWeight" type="double"/>
+      <Attribute name="Engines" type="int"/>
+      <Attribute name="EngineType" type="string"/>
+      <Attribute name="RangeKm" type="int"/>
+      <Attribute name="HoursFlown" type="double"/>
+      <Attribute name="LastMaintenanceDate" type="datetime"/>
+      <Attribute name="Status" type="string"/>
+      <Attribute name="BaseAirportId" type="int" fk="Airport.Id"/>
+      <Attribute name="AircraftTypeId" type="int" fk="AircraftType.Id" required="true"/>
+    </Entity>
+    <Entity name="AircraftMaintenance">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="AircraftId" type="int" fk="Aircraft.Id" required="true"/>
+      <Attribute name="MaintenanceDate" type="datetime" required="true"/>
+      <Attribute name="Description" type="string"/>
+      <Attribute name="WorkHours" type="int"/>
+    </Entity>
+    <Entity name="FlightStatus">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+    </Entity>
+    <Entity name="Flight">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="FlightDate" type="date" required="true"/>
+      <Attribute name="DepartureTime" type="datetime" required="true"/>
+      <Attribute name="ArrivalTime" type="datetime" required="true"/>
+      <Attribute name="FlightType" type="string"/>
+      <Attribute name="OriginGateId" type="int" fk="BoardingGate.Id" required="true"/>
+      <Attribute name="DestinationGateId" type="int" fk="BoardingGate.Id" required="true"/>
+      <Attribute name="AircraftId" type="int" fk="Aircraft.Id" required="true"/>
+      <Attribute name="FlightStatusId" type="int" fk="FlightStatus.Id" required="true"/>
+    </Entity>
+    <Entity name="Person">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="DocumentType" type="string" required="true"/>
+      <Attribute name="DocumentNumber" type="string" required="true" unique="true"/>
+      <Attribute name="FirstName" type="string" required="true"/>
+      <Attribute name="LastName" type="string" required="true"/>
+      <Attribute name="BirthDate" type="date"/>
+      <Attribute name="Email" type="string"/>
+      <Attribute name="Phone" type="string"/>
+    </Entity>
+    <Entity name="Role">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Name" type="string" required="true"/>
+      <Attribute name="Description" type="string"/>
+    </Entity>
+    <Entity name="Employee">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Salary" type="double"/>
+      <Attribute name="PersonId" type="int" fk="Person.Id" required="true"/>
+      <Attribute name="RoleId" type="int" fk="Role.Id" required="true"/>
+    </Entity>
+    <Entity name="CrewAssignment">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="EmployeeId" type="int" fk="Employee.Id" required="true"/>
+      <Attribute name="FlightId" type="int" fk="Flight.Id" required="true"/>
+    </Entity>
+    <Entity name="Permission">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="PermissionType" type="string" required="true"/>
+      <Attribute name="Active" type="boolean" required="true"/>
+    </Entity>
+    <Entity name="RolePermission">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="RoleId" type="int" fk="Role.Id" required="true"/>
+      <Attribute name="PermissionId" type="int" fk="Permission.Id" required="true"/>
+    </Entity>
+    <Entity name="Passenger">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="PersonId" type="int" fk="Person.Id" required="true"/>
+      <Attribute name="FrequentFlyerNumber" type="string"/>
+      <Attribute name="Nationality" type="string"/>
+      <Attribute name="PassportNumber" type="string"/>
+      <Attribute name="VisaInfo" type="string"/>
+      <Attribute name="Status" type="string"/>
+    </Entity>
+    <Entity name="PassengerPreference">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="PassengerId" type="int" fk="Passenger.Id" required="true" unique="true"/>
+      <Attribute name="SpecialAssistance" type="boolean"/>
+      <Attribute name="AssistanceDetail" type="string"/>
+      <Attribute name="MealPreference" type="string"/>
+      <Attribute name="SeatPreference" type="string"/>
+      <Attribute name="OtherPreferences" type="string"/>
+    </Entity>
+    <Entity name="Ticket">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Code" type="string" required="true" unique="true"/>
+      <Attribute name="PassengerId" type="int" fk="Passenger.Id" required="true"/>
+      <Attribute name="FlightId" type="int" fk="Flight.Id" required="true"/>
+    </Entity>
+    <Entity name="TicketPayment">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="TicketId" type="int" fk="Ticket.Id" required="true"/>
+      <Attribute name="Amount" type="double" required="true"/>
+      <Attribute name="PaymentDate" type="datetime" required="true"/>
+      <Attribute name="PaymentMethod" type="string" required="true"/>
+    </Entity>
+    <Entity name="Baggage">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="Code" type="string" required="true"/>
+      <Attribute name="Weight" type="double"/>
+      <Attribute name="TicketId" type="int" fk="Ticket.Id" required="true"/>
+    </Entity>
+    <Entity name="CheckIn">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="PassengerId" type="int" fk="Passenger.Id" required="true"/>
+      <Attribute name="FlightId" type="int" fk="Flight.Id" required="true"/>
+      <Attribute name="Status" type="string" required="true"/>
+    </Entity>
+    <Entity name="AircraftLocation">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="AircraftId" type="int" fk="Aircraft.Id" required="true"/>
+      <Attribute name="AirportId" type="int" fk="Airport.Id" required="true"/>
+      <Attribute name="LocationDateTime" type="datetime" required="true"/>
+      <Attribute name="GateId" type="int" fk="BoardingGate.Id"/>
+      <Attribute name="Remarks" type="string"/>
+    </Entity>
+    <Entity name="AircraftAvailability">
+      <Attribute name="Id" type="int" pk="true"/>
+      <Attribute name="AircraftId" type="int" fk="Aircraft.Id" required="true"/>
+      <Attribute name="StartDateTime" type="datetime" required="true"/>
+      <Attribute name="EndDateTime" type="datetime" required="true"/>
+      <Attribute name="Status" type="string" required="true"/>
+      <Attribute name="Observation" type="string"/>
+    </Entity>
+  </Entities>
+  <Relationships>
+    <Relationship name="Continent_Country" from="Continent" to="Country" cardinality_from="1" cardinality_to="N" fk="Country.ContinentId"/>
+    <Relationship name="Country_Department" from="Country" to="Department" cardinality_from="1" cardinality_to="N" fk="Department.CountryId"/>
+    <Relationship name="Department_City" from="Department" to="City" cardinality_from="1" cardinality_to="N" fk="City.DepartmentId"/>
+    <Relationship name="City_Airport" from="City" to="Airport" cardinality_from="1" cardinality_to="N" fk="Airport.CityId"/>
+    <Relationship name="Airport_Terminal" from="Airport" to="Terminal" cardinality_from="1" cardinality_to="N" fk="Terminal.AirportId"/>
+    <Relationship name="Terminal_BoardingGate" from="Terminal" to="BoardingGate" cardinality_from="1" cardinality_to="N" fk="BoardingGate.TerminalId"/>
+    <Relationship name="AircraftType_Aircraft" from="AircraftType" to="Aircraft" cardinality_from="1" cardinality_to="N" fk="Aircraft.AircraftTypeId"/>
+    <Relationship name="Aircraft_Flight" from="Aircraft" to="Flight" cardinality_from="1" cardinality_to="N" fk="Flight.AircraftId"/>
+    <Relationship name="FlightStatus_Flight" from="FlightStatus" to="Flight" cardinality_from="1" cardinality_to="N" fk="Flight.FlightStatusId"/>
+    <Relationship name="BoardingGate_Flight_Origin" from="BoardingGate" to="Flight" cardinality_from="1" cardinality_to="N" fk="Flight.OriginGateId"/>
+    <Relationship name="BoardingGate_Flight_Destination" from="BoardingGate" to="Flight" cardinality_from="1" cardinality_to="N" fk="Flight.DestinationGateId"/>
+    <Relationship name="Aircraft_Maintenance" from="Aircraft" to="AircraftMaintenance" cardinality_from="1" cardinality_to="N" fk="AircraftMaintenance.AircraftId"/>
+    <Relationship name="Aircraft_Availability" from="Aircraft" to="AircraftAvailability" cardinality_from="1" cardinality_to="N" fk="AircraftAvailability.AircraftId"/>
+    <Relationship name="Aircraft_Location" from="Aircraft" to="AircraftLocation" cardinality_from="1" cardinality_to="N" fk="AircraftLocation.AircraftId"/>
+    <Relationship name="Airport_AircraftLocation" from="Airport" to="AircraftLocation" cardinality_from="1" cardinality_to="N" fk="AircraftLocation.AirportId"/>
+    <Relationship name="Person_Employee" from="Person" to="Employee" cardinality_from="1" cardinality_to="0..1" fk="Employee.PersonId"/>
+    <Relationship name="Person_Passenger" from="Person" to="Passenger" cardinality_from="1" cardinality_to="0..1" fk="Passenger.PersonId"/>
+    <Relationship name="Role_Employee" from="Role" to="Employee" cardinality_from="1" cardinality_to="N" fk="Employee.RoleId"/>
+    <Relationship name="Employee_Flight_Crew" from="Employee" to="CrewAssignment" cardinality_from="1" cardinality_to="N" fk="CrewAssignment.EmployeeId"/>
+    <Relationship name="Flight_CrewAssignment" from="Flight" to="CrewAssignment" cardinality_from="1" cardinality_to="N" fk="CrewAssignment.FlightId"/>
+    <Relationship name="Role_Permission_mn" from="Role" to="RolePermission" cardinality_from="1" cardinality_to="N" fk="RolePermission.RoleId"/>
+    <Relationship name="Permission_Role_mn" from="Permission" to="RolePermission" cardinality_from="1" cardinality_to="N" fk="RolePermission.PermissionId"/>
+    <Relationship name="Passenger_Preference" from="Passenger" to="PassengerPreference" cardinality_from="1" cardinality_to="0..1" fk="PassengerPreference.PassengerId"/>
+    <Relationship name="Passenger_Ticket" from="Passenger" to="Ticket" cardinality_from="1" cardinality_to="N" fk="Ticket.PassengerId"/>
+    <Relationship name="Flight_Ticket" from="Flight" to="Ticket" cardinality_from="1" cardinality_to="N" fk="Ticket.FlightId"/>
+    <Relationship name="Ticket_Payment" from="Ticket" to="TicketPayment" cardinality_from="1" cardinality_to="N" fk="TicketPayment.TicketId"/>
+    <Relationship name="Ticket_Baggage" from="Ticket" to="Baggage" cardinality_from="1" cardinality_to="N" fk="Baggage.TicketId"/>
+    <Relationship name="Passenger_CheckIn" from="Passenger" to="CheckIn" cardinality_from="1" cardinality_to="N" fk="CheckIn.PassengerId"/>
+    <Relationship name="Flight_CheckIn" from="Flight" to="CheckIn" cardinality_from="1" cardinality_to="N" fk="CheckIn.FlightId"/>
+  </Relationships>
+</MER>

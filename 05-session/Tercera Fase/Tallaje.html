@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Timeline MVP - Desarrollo en 80 días</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(45deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 300;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .timeline-stats {
+            background: white;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid;
+        }
+        
+        .stat-card.total { border-left-color: #3498db; background: #ebf3fd; }
+        .stat-card.sprints { border-left-color: #27ae60; background: #d5f4e6; }
+        .stat-card.parallel { border-left-color: #f39c12; background: #fef5e7; }
+        .stat-card.buffer { border-left-color: #e74c3c; background: #fdeaea; }
+        
+        .stat-number {
+            font-size: 2.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .stat-label {
+            color: #7f8c8d;
+            font-weight: 500;
+        }
+        
+        .timeline-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .timeline-header {
+            background: linear-gradient(45deg, #34495e, #2c3e50);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .timeline-content {
+            padding: 30px;
+        }
+        
+        .sprint {
+            margin-bottom: 40px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .sprint:hover {
+            transform: translateY(-5px);
+        }
+        
+        .sprint-header {
+            padding: 20px 30px;
+            color: white;
+            font-size: 1.4em;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sprint1 { background: linear-gradient(45deg, #8e44ad, #9b59b6); }
+        .sprint2 { background: linear-gradient(45deg, #2980b9, #3498db); }
+        .sprint3 { background: linear-gradient(45deg, #27ae60, #2ecc71); }
+        .sprint4 { background: linear-gradient(45deg, #f39c12, #e67e22); }
+        
+        .sprint-meta {
+            font-size: 0.8em;
+            opacity: 0.9;
+        }
+        
+        .sprint-content {
+            background: #f8f9fa;
+            padding: 25px 30px;
+        }
+        
+        .week-section {
+            margin-bottom: 25px;
+        }
+        
+        .week-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .tasks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+        
+        .task-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-left: 4px solid;
+            position: relative;
+        }
+        
+        .task-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .task-card.xs { border-left-color: #8e44ad; }
+        .task-card.s { border-left-color: #2980b9; }
+        .task-card.m { border-left-color: #27ae60; }
+        .task-card.l { border-left-color: #f39c12; }
+        
+        .task-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+        
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85em;
+            color: #7f8c8d;
+        }
+        
+        .task-size {
+            background: #ecf0f1;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .task-days {
+            background: #3498db;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        
+        .parallel-indicator {
+            position: absolute;
+            top: -8px;
+            right: 10px;
+            background: #e67e22;
+            color: white;
+            font-size: 0.7em;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        
+        .dependencies {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .dependencies h4 {
+            margin: 0 0 10px 0;
+            color: #856404;
+        }
+        
+        .dependencies p {
+            margin: 0;
+            color: #856404;
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .tasks-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .sprint-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Timeline MVP - Sistema de Aerolínea</h1>
+            <p>Desarrollo escalonado en 4 sprints | 80 días totales</p>
+        </div>
+        
+        <div class="timeline-stats">
+            <div class="stat-card total">
+                <div class="stat-number">80</div>
+                <div class="stat-label">Días Totales</div>
+            </div>
+            <div class="stat-card sprints">
+                <div class="stat-number">4</div>
+                <div class="stat-label">Sprints</div>
+            </div>
+            <div class="stat-card parallel">
+                <div class="stat-number">~60%</div>
+                <div class="stat-label">Paralelización</div>
+            </div>
+            <div class="stat-card buffer">
+                <div class="stat-number">3</div>
+                <div class="stat-label">Días Buffer</div>
+            </div>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="timeline-header">
+                <h2>🚀 Cronograma de Desarrollo</h2>
+            </div>
+            
+            <div class="timeline-content">
+                <!-- Sprint 1 -->
+                <div class="sprint">
+                    <div class="sprint-header sprint1">
+                        <span>🏗️ Sprint 1: Fundación</span>
+                        <span class="sprint-meta">Días 1-20 | 20 días</span>
+                    </div>
+                    <div class="sprint-content">
+                        <div class="dependencies">
+                            <h4>🔗 Dependencias Críticas</h4>
+                            <p>El modelo ER debe completarse antes que las migraciones. La autenticación es bloqueante para el resto del sistema.</p>
+                        </div>
+                        
+                        <div class="week-section">
+                            <div class="week-title">📋 Semana 1-2 (Días 1-14)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card l">
+                                    <div class="task-title">Definir el modelo ER completo</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">L</span>
+                                        <span class="task-days">12d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Cargar datos semilla para geografía</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">XS</span>
+                                        <span class="task-days">2d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="week-section">
+                            <div class="week-title">🔐 Semana 3 (Días 15-20)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card s">
+                                    <div class="task-title">Crear migración de base de datos para user</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">3d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de continent, country, department, city</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">XS</span>
+                                        <span class="task-days">2d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Contenerizar servicios con Docker</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">3d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sprint 2 -->
+                <div class="sprint">
+                    <div class="sprint-header sprint2">
+                        <span>🔐 Sprint 2: Autenticación & Core</span>
+                        <span class="sprint-meta">Días 21-40 | 20 días</span>
+                    </div>
+                    <div class="sprint-content">
+                        <div class="week-section">
+                            <div class="week-title">🛡️ Semana 4-5 (Días 21-35)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card m">
+                                    <div class="task-title">Implementar autenticación con JWT y refresh tokens</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">M</span>
+                                        <span class="task-days">8d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card m">
+                                    <div class="task-title">Implementar control de acceso RBAC</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">M</span>
+                                        <span class="task-days">10d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card s">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Construir CRUD de person y enlace con user</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">4d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="week-section">
+                            <div class="week-title">✈️ Semana 6 (Días 36-40)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card s">
+                                    <div class="task-title">Crear CRUD de airport</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">3d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de airline</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">XS</span>
+                                        <span class="task-days">1d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de aircraft_type</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">XS</span>
+                                        <span class="task-days">1d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sprint 3 -->
+                <div class="sprint">
+                    <div class="sprint-header sprint3">
+                        <span>🛫 Sprint 3: Operaciones de Vuelo</span>
+                        <span class="sprint-meta">Días 41-60 | 20 días</span>
+                    </div>
+                    <div class="sprint-content">
+                        <div class="week-section">
+                            <div class="week-title">🛩️ Semana 7-8 (Días 41-55)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card s">
+                                    <div class="task-title">Crear CRUD de aircraft</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">3d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card s">
+                                    <div class="task-title">Crear CRUD de route</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">4d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card m">
+                                    <div class="task-title">Crear CRUD de flight y relaciones</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">M</span>
+                                        <span class="task-days">8d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de flight_type, flight_status</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">XS</span>
+                                        <span class="task-days">2d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="week-section">
+                            <div class="week-title">📅 Semana 9 (Días 56-60)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card m">
+                                    <div class="task-title">Implementar flight_schedule</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">M</span>
+                                        <span class="task-days">7d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de crew_role</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">XS</span>
+                                        <span class="task-days">1d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card s">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de crew_member</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">3d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sprint 4 -->
+                <div class="sprint">
+                    <div class="sprint-header sprint4">
+                        <span>🎫 Sprint 4: Reservas & Finalización</span>
+                        <span class="sprint-meta">Días 61-80 | 20 días</span>
+                    </div>
+                    <div class="sprint-content">
+                        <div class="week-section">
+                            <div class="week-title">👥 Semana 10-11 (Días 61-75)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card m">
+                                    <div class="task-title">Implementar crew_assignment</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">M</span>
+                                        <span class="task-days">6d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card s">
+                                    <div class="task-title">Crear CRUD de passenger</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">3d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card m">
+                                    <div class="task-title">Crear CRUD de reservation</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">M</span>
+                                        <span class="task-days">9d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card xs">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de ticket_class</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">XS</span>
+                                        <span class="task-days">1d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="week-section">
+                            <div class="week-title">🎟️ Semana 12 (Días 76-80)</div>
+                            <div class="tasks-grid">
+                                <div class="task-card l">
+                                    <div class="task-title">Crear CRUD de ticket y emisión desde reserva</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">L</span>
+                                        <span class="task-days">13d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card s">
+                                    <div class="parallel-indicator">Paralelo</div>
+                                    <div class="task-title">Crear CRUD de baggage</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">S</span>
+                                        <span class="task-days">4d</span>
+                                    </div>
+                                </div>
+                                <div class="task-card l">
+                                    <div class="task-title">Implementar checkin online básico</div>
+                                    <div class="task-meta">
+                                        <span class="task-size">L</span>
+                                        <span class="task-days">11d</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tareas de Soporte (Continuas) -->
+                <div class="sprint">
+                    <div class="sprint-header" style="background: linear-gradient(45deg, #16a085, #1abc9c);">
+                        <span>🔧 Tareas de Soporte (Continuas)</span>
+                        <span class="sprint-meta">Durante todo el proyecto</span>
+                    </div>
+                    <div class="sprint-content">
+                        <div class="tasks-grid">
+                            <div class="task-card l">
+                                <div class="task-title">Diseñar API REST v1 con OpenAPI/Swagger</div>
+                                <div class="task-meta">
+                                    <span class="task-size">L</span>
+                                    <span class="task-days">14d</span>
+                                </div>
+                            </div>
+                            <div class="task-card m">
+                                <div class="task-title">Añadir paginación, ordenamiento y filtros</div>
+                                <div class="task-meta">
+                                    <span class="task-size">M</span>
+                                    <span class="task-days">6d</span>
+                                </div>
+                            </div>
+                            <div class="task-card s">
+                                <div class="task-title">Implementar validación y sanitización</div>
+                                <div class="task-meta">
+                                    <span class="task-size">S</span>
+                                    <span class="task-days">4d</span>
+                                </div>
+                            </div>
+                            <div class="task-card s">
+                                <div class="task-title">Construir pruebas unitarias básicas</div>
+                                <div class="task-meta">
+                                    <span class="task-size">S</span>
+                                    <span class="task-days">5d</span>
+                                </div>
+                            </div>
+                            <div class="task-card m">
+                                <div class="task-title">Configurar CI/CD básico</div>
+                                <div class="task-meta">
+                                    <span class="task-size">M</span>
+                                    <span class="task-days">7d</span>
+                                </div>
+                            </div>
+                            <div class="task-card s">
+                                <div class="task-title">Implementar rate limiting</div>
+                                <div class="task-meta">
+                                    <span class="task-size">S</span>
+                                    <span class="task-days">3d</span>
+                                </div>
+                            </div>
+                            <div class="task-card xs">
+                                <div class="task-title">Añadir endpoints /health y /ready</div>
+                                <div class="task-meta">
+                                    <span class="task-size">XS</span>
+                                    <span class="task-days">1d</span>
+                                </div>
+                            </div>
+                            <div class="task-card xs">
+                                <div class="task-title">Añadir CORS configurable</div>
+                                <div class="task-meta">
+                                    <span class="task-size">XS</span>
+                                    <span class="task-days">1d</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tareas Excluidas -->
+                <div class="sprint">
+                    <div class="sprint-header" style="background: linear-gradient(45deg, #e74c3c, #c0392b);">
+                        <span>❌ Tareas Excluidas del MVP</span>
+                        <span class="sprint-meta">Requieren +65 días adicionales</span>
+                    </div>
+                    <div class="sprint-content">
+                        <div class="tasks-grid">
+                            <div class="task-card l" style="opacity: 0.7;">
+                                <div class="task-title">Documentación técnica completa (modelo + API + guías)</div>
+                                <div class="task-meta">
+                                    <span class="task-size">XL</span>
+                                    <span class="task-days">18d</span>
+                                </div>
+                            </div>
+                            <div class="task-card l" style="opacity: 0.7;">
+                                <div class="task-title">Construir pruebas de integración completas</div>
+                                <div class="task-meta">
+                                    <span class="task-size">XL</span>
+                                    <span class="task-days">17d</span>
+                                </div>
+                            </div>
+                            <div class="task-card l" style="opacity: 0.7;">
+                                <div class="task-title">Implementar auditoría completa en todas las tablas</div>
+                                <div class="task-meta">
+                                    <span class="task-size">XL</span>
+                                    <span class="task-days">16d</span>
+                                </div>
+                            </div>
+                            <div class="task-card l" style="opacity: 0.7;">
+                                <div class="task-title">Implementar logs estructurados y trazabilidad completa</div>
+                                <div class="task-meta">
+                                    <span class="task-size">XL</span>
+                                    <span class="task-days">15d</span>
+                                </div>
+                            </div>
+                            <div class="task-card l" style="opacity: 0.7;">
+                                <div class="task-title">Implementar caché distribuido para catálogos</div>
+                                <div class="task-meta">
+                                    <span class="task-size">L</span>
+                                    <span class="task-days">12d</span>
+                                </div>
+                            </div>
+                            <div class="task-card m" style="opacity: 0.7;">
+                                <div class="task-title">Preparar dataset semilla completo para QA</div>
+                                <div class="task-meta">
+                                    <span class="task-size">M</span>
+                                    <span class="task-days">8d</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+      
